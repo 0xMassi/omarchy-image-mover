@@ -63,9 +63,8 @@ oim --auto wallpaper.png
 
 ### Basic Commands
 
-All three commands are equivalent:
+All commands are equivalent:
 - `oim` (recommended - short and easy)
-- `omi` (alternative short form)
 - `omarchy-mover` (full name)
 
 ```bash
