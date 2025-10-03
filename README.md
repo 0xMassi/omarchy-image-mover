@@ -1,19 +1,26 @@
 # Omarchy Image Mover
 
-Interactive theme-based image organizer that intelligently sorts wallpapers into theme directories using automatic color detection.
+Interactive theme-based image organizer designed for the Omarchy distribution. Intelligently sorts wallpapers into theme directories using automatic color detection.
+
+**Note**: This tool is specifically designed for the Omarchy distribution running on ARM devices.
 
 ## Features
 
-- **Auto-detection**: Analyzes image colors and suggests matching themes
+- **Improved Auto-detection**: Uses dominant color analysis with perceptual color weighting for accurate theme matching
+- **Live Preview**: See detected theme directly in the image preview pane before selection
+- **Visual Selection Indicators**: Checkmark (✓) shows already-selected images during browsing
 - **Interactive browsing**: Navigate directories with persistent selection
-- **Batch processing**: Select multiple images before processing
-- **Confidence scoring**: Get feedback on detection accuracy
+- **Batch processing**: Select multiple images with clear filename identification in prompts
+- **Confidence scoring**: Get feedback on detection accuracy (HIGH/MED/LOW)
+- **User Confirmation**: Always prompts before moving files - no automatic operations
 - **Flexible workflow**: Continue selecting or process at any time
 - **Smart navigation**: DONE/CLEAR options for easy workflow control
 - **Copy mode**: Preserve originals while organizing
+- **Keyboard Interrupt Handling**: Press Ctrl+C at any time to safely cancel without moving files
 
 ## Requirements
 
+- Omarchy distribution (ARM devices)
 - Python 3.8+
 - [fzf](https://github.com/junegunn/fzf) - fuzzy finder
 - Pillow (installed automatically)
@@ -21,14 +28,8 @@ Interactive theme-based image organizer that intelligently sorts wallpapers into
 ### Install fzf
 
 ```bash
-# Arch Linux
+# On Omarchy/Arch-based ARM
 sudo pacman -S fzf
-
-# Debian/Ubuntu/Armbian
-sudo apt install fzf
-
-# macOS
-brew install fzf
 ```
 
 ## Installation
@@ -87,10 +88,13 @@ oim path/to/image.png
 ### Interactive Mode Workflow
 
 1. **Navigate** with arrow keys or j/k
-2. **Select images** with Tab (multi-select)
-3. **Continue selecting** or navigate to `[DONE]` when ready
-4. **Press Enter** on `[DONE]` to process
-5. **Review** auto-detected themes and confirm/override
+2. **Preview** images - theme detection shown in preview pane
+3. **Select images** with Tab (multi-select) - selected images show ✓ checkmark
+4. **Continue selecting** or navigate to `[DONE]` when ready
+5. **Press Enter** on `[DONE]` to process
+6. **Review** each image with detected theme and filename
+7. **Confirm** - Choose "Yes, use this theme" or "No, pick different theme"
+8. **Complete** - View summary and optional undo command
 
 ### Keyboard Shortcuts
 
@@ -101,16 +105,31 @@ oim path/to/image.png
 | Tab | Toggle image selection |
 | Ctrl+A | Select all |
 | Ctrl+D | Deselect all |
+| Ctrl+C | Cancel operation safely (no files moved) |
 | ESC | Action menu / Cancel |
 
 ### Selection Indicators
 
 When browsing, you'll see:
 - `[DIR] folder/` - Directory
-- `[IMG] image.png` - Image file
+- `[IMG] image.png (2.3MB)` - Image file with size
+- `[IMG] ✓ selected.png (1.8MB)` - Already selected image (checkmark)
 - `[UP] ../` - Parent directory
 - `[DONE] Process X image(s)` - Appears when images are selected
 - `[CLEAR] Clear selection` - Remove all selections
+
+### Preview Pane
+
+When you hover over an image, the preview pane shows:
+```
+File: wallpaper.png
+1920x1080 | JPEG | 2.3MB
+Theme: [HIGH] catppuccin-latte (dist: 0.9)
+
+[Image preview]
+```
+
+This lets you see what theme will be suggested before you even select the file.
 
 ## Supported Themes
 
@@ -148,10 +167,15 @@ Images are organized in:
 
 ```bash
 oim ~/Downloads
-# Tab through images to select
+# Browse images - see theme preview in right pane
+# Tab to select multiple images (✓ checkmark appears)
 # Navigate to [DONE] and press Enter
-# Review auto-detected themes
-# Confirm or manually override
+# For each image, you'll see:
+#   [HIGH] Detected: catppuccin (RGB: (30, 30, 46), distance: 12.3)
+#   [filename.jpg] Use theme "catppuccin"?
+#     > Yes, use this theme
+#       No, pick different theme
+# View summary at the end
 ```
 
 ### Example 2: Process Single Image
@@ -160,8 +184,12 @@ oim ~/Downloads
 oim --auto ~/Pictures/dark-forest.png
 # Output:
 # [1/1] dark-forest.png
-#    Detected: everforest (confidence: high, RGB: (43, 51, 57))
-#    ✓ dark-forest.png → everforest/backgrounds/
+#    [HIGH] Detected: everforest (RGB: (43, 51, 57), distance: 8.2)
+#    [dark-forest.png] Use theme "everforest"?
+#      > Yes, use this theme
+#    ✓ Moved: dark-forest.png → everforest/backgrounds/
+#
+# 💡 To undo this operation, run: oim --undo
 ```
 
 ### Example 3: Manual Theme Selection
@@ -183,13 +211,13 @@ oim --copy --auto ~/wallpapers
 
 ## Confidence Levels
 
-Auto-detection provides confidence feedback:
+Auto-detection provides confidence feedback based on perceptual color distance:
 
-- **High** (distance < 30): Very confident match
-- **Medium** (distance < 50): Good match, usually correct
-- **Low** (distance > 50): Uncertain, manual confirmation recommended
+- **[HIGH]** (distance < 20): Very confident match - colors are very similar
+- **[MED]** (distance < 35): Good match - colors are reasonably close
+- **[LOW]** (distance ≥ 35): Uncertain match - colors differ significantly
 
-Low confidence detections will prompt for confirmation before proceeding.
+All detections require user confirmation before moving files. You can choose to accept the suggestion or pick a different theme manually.
 
 ## Troubleshooting
 
@@ -210,20 +238,10 @@ source ~/.bashrc  # or source ~/.zshrc
 
 ### fzf not found
 
-Install fzf using your package manager:
+Install fzf on Omarchy:
 
 ```bash
-# Arch/Manjaro
 sudo pacman -S fzf
-
-# Debian/Ubuntu
-sudo apt install fzf
-
-# Fedora
-sudo dnf install fzf
-
-# macOS
-brew install fzf
 ```
 
 ### Permission denied
@@ -332,9 +350,23 @@ MIT License - see LICENSE file for details.
 
 Created by [0xMassi](https://github.com/0xMassi)
 
+## Screenshots
+
+### Interactive Browser
+<!-- Screenshot of the fzf interactive browser showing image selection -->
+
+### Theme Detection
+<!-- Screenshot showing the auto-detection results with confidence scores -->
+
+### Theme Selection
+<!-- Screenshot of manual theme selection interface -->
+
+### Processing Results
+<!-- Screenshot showing successful image organization -->
+
 ## Acknowledgments
 
-- Built for [Omarchy](https://github.com/yourusername/omarchy) theme management
+- Built for Omarchy theme management
 - Uses [fzf](https://github.com/junegunn/fzf) for fuzzy finding
 - Inspired by the need for efficient wallpaper organization
 

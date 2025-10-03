@@ -2,7 +2,7 @@
 Omarchy Image Mover - Interactive theme-based image organizer
 """
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 __author__ = '0xMassi'
 
 from .main import main
@@ -17,4 +17,6 @@ __all__ = [
     'ImageMover',
     'THEMES',
     'get_theme_list',
+    'Config',
+    'Hisotry',
 ]

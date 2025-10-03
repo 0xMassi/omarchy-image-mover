@@ -12,7 +12,7 @@ if os.path.exists('README.md'):
 
 setup(
     name='omarchy-image-mover',
-    version='0.0.1',
+    version='0.0.2',
     description='Interactive theme-based image organizer for Omarchy',
     long_description=long_description,
     long_description_content_type='text/markdown',
